@@ -1,7 +1,10 @@
 package parser
 
+import interpreter.Expr
 import kotlinx.collections.immutable.persistentHashMapOf
 
+
+//TEST
 sealed class Token {
 
     @Override
@@ -26,13 +29,16 @@ sealed class Token {
     data class IDENT(val ident: String) : Token()
 
     // Operator
+    // Lexer: Soll Zeichen erkennt: +, -, *, /, ^, root, =, pi, checksum
     object PLUS : Token()
     object MINUS : Token()
     object MULTIPLY : Token()
     object DIVIDES : Token()
     object POWER : Token()
-    object CHECKSUM : Token()
     object FACULTY : Token()
+    object CHECKSUM : Token()
+    object ROOT : Token()
+
 
     // Control
     object EOF : Token()
@@ -72,21 +78,23 @@ class Lexer(input: String) {
             '-' -> Token.MINUS
             '=' -> Token.EQUALS
             '!' -> Token.FACULTY
-            'c' ->
-            }
             else -> when {
-                c.isJavaIdentifierStart() -> lexIdentifier(c)
+                c.isLetter() -> lexIdentifier(c)
                 c.isDigit() -> lexDouble(c)
                 else -> throw Exception("Unexpected $c")
             }
         }
     }
 
-    private fun (lex)
 
     private fun lexDouble(first: Char): Token {
         var res = first.toString()
-        while (iter.peek()?.isDigit() == true) {
+        var pointFound = false
+        while (iter.peek()?.isDigit() == true || iter.peek()?.equals('.') == true) {
+            if(iter.peek()?.equals('.') == true && pointFound)
+                throw Exception("Too many dots")
+            if(iter.peek()?.equals('.') == true)
+                pointFound = true
             res += iter.next()
         }
         return Token.DOUBLE_LIT(res.toDouble())
@@ -94,22 +102,14 @@ class Lexer(input: String) {
 
     private fun lexIdentifier(first: Char): Token {
         var res = first.toString()
-        while (iter.peek()?.isJavaIdentifierPart() == true) {
+        while (iter.peek()?.isLetter() == true) {
             res += iter.next()
         }
         return when (res) {
-            "if" -> Token.IF
-            "then" -> Token.THEN
-            "else" -> Token.ELSE
-            "let" -> Token.LET
-            "rec" -> Token.REC
-            "in" -> Token.IN
-            "true" -> Token.BOOL_LIT(true)
-            "false" -> Token.BOOL_LIT(false)
-            "Int" -> Token.DOUBLE
-            "Bool" -> Token.BOOL
-            "String" -> Token.STRING
-            else -> Token.IDENT(res)
+            "root" -> Token.ROOT
+            "checksum" -> Token.CHECKSUM
+            "pi" -> Token.DOUBLE_LIT(Math.PI)
+            else -> throw Exception("Unknown Token")
         }
     }
 
