@@ -100,13 +100,13 @@ class Lexer(input: String) {
       '"' -> lexString()
       else -> when {
         c.isJavaIdentifierStart() -> lexIdentifier(c)
-        c.isDigit() -> lexInt(c)
+        c.isDigit() -> lexDOUBLE(c)
         else -> throw Exception("Unexpected $c")
       }
     }
   }
 
-  private fun lexInt(first: Char): Token {
+  private fun lexDOUBLE(first: Char): Token {
     var res = first.toString()
     while (iter.peek()?.isDigit() == true) {
       res += iter.next()
