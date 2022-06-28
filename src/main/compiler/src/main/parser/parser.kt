@@ -4,7 +4,7 @@ import interpreter.Expr
 import kotlinx.collections.immutable.persistentHashMapOf
 
 
-//TEST
+//TEST dis shit
 sealed class Token {
 
     @Override
